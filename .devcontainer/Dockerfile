@@ -13,6 +13,13 @@ ENV PYTHONUNBUFFERED=1
 COPY requirements.txt .
 RUN python -m pip install -r requirements.txt
 
+# Install Linux tools
+RUN apt-get update -y && \
+    apt-get install git -y && \
+    apt-get install -y tree 
+
+#git tree sudo
+
 WORKDIR /app
 COPY . /app
 
