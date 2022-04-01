@@ -1,2 +1,3 @@
 - Requires Python 3.10
 - To run FastAPI webserver, type `uvicorn src.main:app --reload` in root
+- More details: https://towardsdatascience.com/deploy-a-dockerized-fastapi-app-to-google-cloud-platform-24f72266c7ef
