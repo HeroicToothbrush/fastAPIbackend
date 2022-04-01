@@ -59,3 +59,6 @@ async def create_new_user(user: UserCreate):
     # todo add password validation
     create_user(db, user)
     return status.HTTP_200_OK
+
+if __name__ == '__main__':
+    uvicorn.run(app, host='0.0.0.0', port=8080)
