@@ -1,0 +1,2 @@
+- Requires Python 3.10
+- To run FastAPI webserver, type `uvicorn src.main:app --reload` in root
