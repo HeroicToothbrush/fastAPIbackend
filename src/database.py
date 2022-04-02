@@ -60,6 +60,7 @@ db_pass = os.environ["DB_PASS"]
 db_name = os.environ["DB_NAME"]
 db_socket_dir = os.environ.get("DB_SOCKET_DIR", "/cloudsql")
 instance_connection_name = os.environ["INSTANCE_CONNECTION_NAME"]
+
 print(db_socket_dir)
 pool = sqlalchemy.create_engine(
 

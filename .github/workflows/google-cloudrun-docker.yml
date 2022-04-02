@@ -55,6 +55,13 @@ env:
   SERVICE: venturesbackend # TODO: update Cloud Run service name
   REGION: europe-west1 # TODO: update Cloud Run service region
 
+  # adding these env vars for db connection to Cloud SQL
+  DB_USER: '${{ secrets.DB_USER }}'
+  DB_PASS: '${{ secrets.DB_PASS }}'
+  DB_NAME: '${{ secrets.DB_NAME }}'
+  DB_SOCKET_DIR: '${{ secrets.DB_SOCKET_DIR }}'
+  INSTANCE_CONNECTION_NAME: '${{ secrets.INSTANCE_CONNECTION_NAME }}'
+
 jobs:
   deploy:
     # Add 'id-token' with the intended permissions for workload identity federation
