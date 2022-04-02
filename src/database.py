@@ -1,4 +1,5 @@
 from time import strftime
+import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -18,7 +19,7 @@ if config.environment == 'dev':
     )
 
 elif config.environment == 'production':
-    engine = sqlalchemy.create_engine(
+    engine = create_engine(
 
         # Equivalent URL:
         # postgresql+pg8000://<db_user>:<db_pass>@/<db_name>
