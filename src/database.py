@@ -58,7 +58,7 @@ import sqlalchemy
 db_user = os.environ["DB_USER"]
 db_pass = os.environ["DB_PASS"]
 db_name = os.environ["DB_NAME"]
-db_socket_dir = os.environ.get("DB_SOCKET_DIR", "/cloudsql")
+# db_socket_dir = os.environ.get("DB_SOCKET_DIR", "/cloudsql")
 instance_connection_name = os.environ["INSTANCE_CONNECTION_NAME"]
 
 print(db_socket_dir)
