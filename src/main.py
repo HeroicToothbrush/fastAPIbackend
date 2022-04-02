@@ -13,6 +13,8 @@ from .database import get_db
 from .schemas import Token, User, UserCreate
 from starlette.responses import RedirectResponse
 app = FastAPI()
+
+# todo - needf to replace this with alembic migrations, eg here https://fastapi.tiangolo.com/tutorial/sql-databases/
 models.Base.metadata.create_all(bind=engine)
 
 # todo allow_origins=[*] is not recommended for Production purposes. It is recommended to have specified list of origins
@@ -28,18 +30,25 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=["*"])
 
-db = get_db()
+# Dependency
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 
 """
 FastAPI can be run on multiple worker process with the help of Gunicorn server with the help of uvicorn.workers.UvicornWorker worker class. Every worker process starts its instance of FastAPI application on its own Process Id. In order to ensure every instance of application communicates to the database, we will connect and disconnect to the database instance in the FastAPI events  startup and shutdown respectively.
 """
 
 @app.on_event("startup")
-async def startup():
+async def startup(db: Session = Depends(get_db)):
     await db.connect()
 
 @app.on_event("shutdown")
-async def shutdown():
+async def shutdown(db: Session = Depends(get_db)):
     await db.disconnect()
 
 
@@ -49,7 +58,7 @@ def main():
     return RedirectResponse(url="/docs/")
 
 @app.post("/token", response_model=Token)
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
+async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
@@ -70,7 +79,7 @@ async def read_users_me(current_user: User = Depends(get_current_active_user)):
 
 
 @app.post("/users/create/")
-async def create_new_user(user: UserCreate):
+async def create_new_user(user: UserCreate, db: Session = Depends(get_db)):
     # todo add password validation
     create_user(db, user)
     return status.HTTP_200_OK

@@ -95,7 +95,3 @@ for schema in schemas:
     for table_name in inspector.get_table_names(schema=schema):
         for column in inspector.get_columns(table_name, schema=schema):
             print("Column: %s" % column)
-
-db = SessionLocal()
-def get_db():
-    return db
