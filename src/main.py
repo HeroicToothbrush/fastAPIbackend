@@ -11,9 +11,12 @@ from .auth import authenticate_user, ACCESS_TOKEN_EXPIRE_MINUTES, create_user, c
 from .database import engine
 from .database import get_db
 from .schemas import Token, User, UserCreate
-
+from starlette.responses import RedirectResponse
 app = FastAPI()
 models.Base.metadata.create_all(bind=engine)
+
+# todo allow_origins=[*] is not recommended for Production purposes. It is recommended to have specified list of origins
+# eg allow_origins=['client-facing-example-app.com', 'localhost:5000']
 origins = [
     "*",
 ]
@@ -27,11 +30,23 @@ app.add_middleware(
 
 db = get_db()
 
+"""
+FastAPI can be run on multiple worker process with the help of Gunicorn server with the help of uvicorn.workers.UvicornWorker worker class. Every worker process starts its instance of FastAPI application on its own Process Id. In order to ensure every instance of application communicates to the database, we will connect and disconnect to the database instance in the FastAPI events  startup and shutdown respectively.
+"""
 
+@app.on_event("startup")
+async def startup():
+    await db.connect()
+
+@app.on_event("shutdown")
+async def shutdown():
+    await db.disconnect()
+
+
+# todo refactor these routes away
 @app.get("/")
-async def home():
-    return {"message": "This is the homepage"}
-
+def main():
+    return RedirectResponse(url="/docs/")
 
 @app.post("/token", response_model=Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):

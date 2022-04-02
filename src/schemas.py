@@ -15,6 +15,9 @@ class User(UserBase):
     is_active: bool
 
     class Config:
+        """
+        allows the app to take ORM objects and translate them into responses automatically.
+        """
         orm_mode = True
 
 
