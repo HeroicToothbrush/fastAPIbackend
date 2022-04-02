@@ -24,7 +24,7 @@ if config.env == 'dev':
 
 elif config.env == 'production':
     POSTGRES_DATABASE_URL = f"postgresql+pg8000://{config.db.user}:{config.db.password}@/{config.db.name}" \
-                            f"?unix_sock={config.db.socket_dir}/{instance_connection_name}/.s.PGSQL.5432"
+                            f"?unix_sock={config.db.socket_dir}/{config.db.instance_connection_name}/.s.PGSQL.5432"
     engine = create_engine(POSTGRES_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
