@@ -31,14 +31,6 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=["*"])
 
-# Dependency
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
 
 """
 FastAPI can be run on multiple worker process with the help of Gunicorn server with the help of uvicorn.workers.UvicornWorker worker class. Every worker process starts its instance of FastAPI application on its own Process Id. In order to ensure every instance of application communicates to the database, we will connect and disconnect to the database instance in the FastAPI events  startup and shutdown respectively.

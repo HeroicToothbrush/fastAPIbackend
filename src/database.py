@@ -88,12 +88,10 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=pool)
 
 Base = declarative_base()
 
-from sqlalchemy import inspect
-inspector = inspect(pool)
-schemas = inspector.get_schema_names()
-
-for schema in schemas:
-    print("schema: %s" % schema)
-    for table_name in inspector.get_table_names(schema=schema):
-        for column in inspector.get_columns(table_name, schema=schema):
-            print("Column: %s" % column)
+# Dependency
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
