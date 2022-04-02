@@ -8,8 +8,9 @@ from sqlalchemy.orm import Session
 from starlette.responses import RedirectResponse
 
 from . import models
+from .config import config
 from .api.api import api_router
-from .auth import authenticate_user, ACCESS_TOKEN_EXPIRE_MINUTES, create_user, create_access_token, \
+from .auth import authenticate_user, create_user, create_access_token, \
     get_current_active_user
 from .database import engine
 from .database import get_db
@@ -63,7 +64,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token_expires = timedelta(minutes=config.auth.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": user.email}, expires_delta=access_token_expires
     )
