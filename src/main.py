@@ -15,6 +15,7 @@ from starlette.responses import RedirectResponse
 app = FastAPI()
 
 # todo - needf to replace this with alembic migrations, eg here https://fastapi.tiangolo.com/tutorial/sql-databases/
+# todo - add alerts, add docs, logging, sentry, mypy and flake8/black, tests, endpoints folder: https://github.com/tiangolo/full-stack-fastapi-postgresql/blob/master/%7B%7Bcookiecutter.project_slug%7D%7D/backend/app/app/core/security.py
 models.Base.metadata.create_all(bind=engine)
 
 # todo allow_origins=[*] is not recommended for Production purposes. It is recommended to have specified list of origins
@@ -85,4 +86,5 @@ async def create_new_user(user: UserCreate, db: Session = Depends(get_db)):
     return status.HTTP_200_OK
 
 if __name__ == '__main__':
+
     uvicorn.run(app, host='0.0.0.0', port=8080)
