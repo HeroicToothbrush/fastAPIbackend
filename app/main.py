@@ -9,7 +9,7 @@ from starlette.responses import RedirectResponse
 
 from . import models
 from .config import config
-from .api.api import api_router
+from .api.routes import api_router
 from .auth import authenticate_user, create_user, create_access_token, \
     get_current_active_user
 from .database import engine

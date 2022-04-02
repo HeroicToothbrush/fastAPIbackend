@@ -31,4 +31,4 @@ USER appuser
 #CMD python3 src/main.py
 # CMD gunicorn src.main:app -c src/gunicorn_config.py
 # Run the web service on container startup using gunicorn webserver.
-CMD exec gunicorn --bind :$PORT --workers 1 --worker-class uvicorn.workers.UvicornWorker  --threads 8 src.main:app
+CMD exec gunicorn --bind :$PORT --workers 1 --worker-class uvicorn.workers.UvicornWorker  --threads 8 app.main:app
