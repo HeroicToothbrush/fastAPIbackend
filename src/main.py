@@ -1,19 +1,22 @@
-from datetime import timedelta
 import uvicorn
+from datetime import timedelta
 from fastapi import Depends, HTTPException, status
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
+from starlette.responses import RedirectResponse
+
 from . import models
+from .api.api import api_router
 from .auth import authenticate_user, ACCESS_TOKEN_EXPIRE_MINUTES, create_user, create_access_token, \
     get_current_active_user
 from .database import engine
 from .database import get_db
 from .schemas import Token, User, UserCreate
-from starlette.responses import RedirectResponse
-app = FastAPI()
 
+app = FastAPI()
+app.include_router(api_router)
 # todo - needf to replace this with alembic migrations, eg here https://fastapi.tiangolo.com/tutorial/sql-databases/
 # todo - add alerts, add docs, logging, sentry, mypy and flake8/black, tests, endpoints folder: https://github.com/tiangolo/full-stack-fastapi-postgresql/blob/master/%7B%7Bcookiecutter.project_slug%7D%7D/backend/app/app/core/security.py
 models.Base.metadata.create_all(bind=engine)
@@ -31,10 +34,11 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=["*"])
 
-
 """
 FastAPI can be run on multiple worker process with the help of Gunicorn server with the help of uvicorn.workers.UvicornWorker worker class. Every worker process starts its instance of FastAPI application on its own Process Id. In order to ensure every instance of application communicates to the database, we will connect and disconnect to the database instance in the FastAPI events  startup and shutdown respectively.
 """
+
+
 # @app.on_event("startup")
 # async def startup(db: Session = Depends(get_db)):
 #     await db.connect()
@@ -48,6 +52,7 @@ FastAPI can be run on multiple worker process with the help of Gunicorn server w
 @app.get("/")
 def main():
     return RedirectResponse(url="/docs/")
+
 
 @app.post("/token", response_model=Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
@@ -63,19 +68,3 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         data={"sub": user.email}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
-
-
-@app.get("/users/me/", response_model=User)
-async def read_users_me(current_user: User = Depends(get_current_active_user)):
-    return current_user
-
-
-@app.post("/users/create/")
-async def create_new_user(user: UserCreate, db: Session = Depends(get_db)):
-    # todo add password validation
-    create_user(db, user)
-    return status.HTTP_200_OK
-
-if __name__ == '__main__':
-
-    uvicorn.run(app, host='0.0.0.0', port=8080)
