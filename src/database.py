@@ -9,12 +9,9 @@ from dataclasses import dataclass
 SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"
 # SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/db"
 
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
-)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-Base = declarative_base()
+# engine = create_engine(
+#     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+# )
 
 PRODUCTION_CONFIG = {}
 
@@ -29,23 +26,23 @@ class Config:
 class ProductionConfig(Config):
     pass
 
-host_server = os.environ.get('host_server', 'localhost')
-db_server_port = urllib.parse.quote_plus(str(os.environ.get('db_server_port', '5432')))
-database_name = os.environ.get('database_name', 'fastapi')
-db_username = urllib.parse.quote_plus(str(os.environ.get('db_username', 'postgres')))
-db_password = urllib.parse.quote_plus(str(os.environ.get('db_password', 'secret')))
-ssl_mode = urllib.parse.quote_plus(str(os.environ.get('ssl_mode','prefer')))
-DATABASE_URL = 'postgresql://{}:{}@{}:{}/{}?sslmode={}'.format(db_username, db_password, host_server, db_server_port, database_name, ssl_mode)
-host_server = os.environ.get('host_server', 'localhost')
-db_server_port = urllib.parse.quote_plus(str(os.environ.get('db_server_port', '5432')))
-database_name = os.environ.get('database_name', 'fastapi')
-db_username = urllib.parse.quote_plus(str(os.environ.get('db_username', 'postgres')))
-db_password = urllib.parse.quote_plus(str(os.environ.get('db_password', 'secret')))
-ssl_mode = urllib.parse.quote_plus(str(os.environ.get('ssl_mode','prefer')))
-DATABASE_URL = 'postgresql://{}:{}@{}:{}/{}?sslmode={}'.format(db_username, db_password, host_server, db_server_port, database_name, ssl_mode)
-db = SessionLocal()
-def get_db():
-    return db
+# host_server = os.environ.get('host_server', 'localhost')
+# db_server_port = urllib.parse.quote_plus(str(os.environ.get('db_server_port', '5432')))
+# database_name = os.environ.get('database_name', 'fastapi')
+# db_username = urllib.parse.quote_plus(str(os.environ.get('db_username', 'postgres')))
+# db_password = urllib.parse.quote_plus(str(os.environ.get('db_password', 'secret')))
+# ssl_mode = urllib.parse.quote_plus(str(os.environ.get('ssl_mode','prefer')))
+# DATABASE_URL = 'postgresql://{}:{}@{}:{}/{}?sslmode={}'.format(db_username, db_password, host_server, db_server_port, database_name, ssl_mode)
+# host_server = os.environ.get('host_server', 'localhost')
+# db_server_port = urllib.parse.quote_plus(str(os.environ.get('db_server_port', '5432')))
+# database_name = os.environ.get('database_name', 'fastapi')
+# db_username = urllib.parse.quote_plus(str(os.environ.get('db_username', 'postgres')))
+# db_password = urllib.parse.quote_plus(str(os.environ.get('db_password', 'secret')))
+# ssl_mode = urllib.parse.quote_plus(str(os.environ.get('ssl_mode','prefer')))
+# DATABASE_URL = 'postgresql://{}:{}@{}:{}/{}?sslmode={}'.format(db_username, db_password, host_server, db_server_port, database_name, ssl_mode)
+# db = SessionLocal()
+# def get_db():
+#     return db
 # def get_db():
 #     db = SessionLocal()
 #     try:
@@ -57,12 +54,13 @@ def get_db():
 # Remember - storing secrets in plaintext is potentially unsafe. Consider using
 # something like https://cloud.google.com/secret-manager/docs/overview to help keep
 # secrets secret.
+import sqlalchemy
 db_user = os.environ["DB_USER"]
 db_pass = os.environ["DB_PASS"]
 db_name = os.environ["DB_NAME"]
 db_socket_dir = os.environ.get("DB_SOCKET_DIR", "/cloudsql")
 instance_connection_name = os.environ["INSTANCE_CONNECTION_NAME"]
-
+print(db_socket_dir)
 pool = sqlalchemy.create_engine(
 
     # Equivalent URL:
@@ -81,5 +79,22 @@ pool = sqlalchemy.create_engine(
                 instance_connection_name)  # i.e "<PROJECT-NAME>:<INSTANCE-REGION>:<INSTANCE-NAME>"
         }
     ),
-    **db_config
+    # **db_config
 )
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=pool)
+
+Base = declarative_base()
+
+from sqlalchemy import inspect
+inspector = inspect(pool)
+schemas = inspector.get_schema_names()
+
+for schema in schemas:
+    print("schema: %s" % schema)
+    for table_name in inspector.get_table_names(schema=schema):
+        for column in inspector.get_columns(table_name, schema=schema):
+            print("Column: %s" % column)
+
+db = SessionLocal()
+def get_db():
+    return db
