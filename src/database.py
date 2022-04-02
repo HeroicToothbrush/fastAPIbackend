@@ -64,7 +64,7 @@ instance_connection_name = os.environ["INSTANCE_CONNECTION_NAME"]
 
 
 
-pool = sqlalchemy.create_engine(
+engine = sqlalchemy.create_engine(
 
     # Equivalent URL:
     # postgresql+pg8000://<db_user>:<db_pass>@/<db_name>
@@ -84,7 +84,7 @@ pool = sqlalchemy.create_engine(
     ),
     # **db_config
 )
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=pool)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
 
