@@ -1,9 +1,8 @@
 import os
-from dataclasses import dataclass
+from pydantic import BaseSettings
 
 
-@dataclass
-class DBConfig:
+class DBConfig(BaseSettings):
     # db_host: str
     # db_server_port: str
     user: str = os.environ["DB_USER"]
@@ -12,8 +11,7 @@ class DBConfig:
     instance_connection_name: str = os.environ["INSTANCE_CONNECTION_NAME"]
     socket_dir: str = "/cloudsql"
 
-@dataclass
-class AuthConfig:
+class AuthConfig(BaseSettings):
     # to get a string like this run:
 # openssl rand -hex 32
     # todo move to secrets
@@ -22,8 +20,7 @@ class AuthConfig:
     ACCESS_TOKEN_EXPIRE_MINUTES = 24 * 60 * 1
 
 
-@dataclass
-class Config:
+class Config(BaseSettings):
     db: DBConfig = DBConfig()
     auth: AuthConfig = AuthConfig()
     env: str = os.environ["ENV"]

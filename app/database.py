@@ -1,11 +1,6 @@
-import os
-import sqlalchemy
-import urllib
-from dataclasses import dataclass
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from time import strftime
 
 from .config import config
 
@@ -19,7 +14,7 @@ def get_db():
         db.close()
 
 
-if config.environment == 'dev':
+if config.env == 'dev':
     SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"
     # SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/db"
 
@@ -27,7 +22,7 @@ if config.environment == 'dev':
         SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
     )
 
-elif config.environment == 'production':
+elif config.env == 'production':
     POSTGRES_DATABASE_URL = f"postgresql+pg8000://{config.db.user}:{config.db.password}@/{config.db.name}" \
                             f"?unix_sock={config.db.socket_dir}/{instance_connection_name}/.s.PGSQL.5432"
     engine = create_engine(POSTGRES_DATABASE_URL)
